@@ -65,3 +65,5 @@ tools/pyopenjtalk*
 tools/activate_python.sh
 tools/sctk*
 tools/sph2pipe*
+
+tools/warp-rnnt
