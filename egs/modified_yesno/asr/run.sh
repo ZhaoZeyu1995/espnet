@@ -8,7 +8,7 @@
 
 # general configuration
 backend=pytorch
-stage=-1       # start from -1 if you need to start from data download
+stage=0       # start from -1 if you need to start from data download
 stop_stage=100
 ngpu=1         # number of gpus ("0" uses cpu, otherwise use gpu)
 debugmode=1
@@ -34,26 +34,26 @@ tag="" # tag for managing experiments.
 set -euo pipefail
 
 fbankdir=fbank
-train_set=train_ynn
-train_dev=dev_ynn
+train_set=train_3gram
+train_dev=dev_3gram
 recog_set="test_yyn test_ynn test_3gram test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise"
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     ### Task dependent. You have to make data the following preparation part by yourself.
     ### But you can utilize Kaldi recipes in most cases
     echo "stage 0: Data preparation"
-    #local/prepare_data.py --dir /disk/scratch4/zzhao/Datasets/modified_yesno
-    local/prepare_sam_data.py --dir /disk/scratch4/zzhao/Datasets/modified_yesno
-    local/prepare_sam_noise_data.py --dir /disk/scratch4/zzhao/Datasets/modified_yesno
-    #for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
-        #sort data/$x/wav.scp > data/$x/wav.scp.sorted
-        #sort data/$x/text > data/$x/text.sorted
-        #sort data/$x/utt2spk > data/$x/utt2spk.sorted
-        #mv data/$x/wav.scp.sorted data/$x/wav.scp
-        #mv data/$x/text.sorted data/$x/text
-        #mv data/$x/utt2spk.sorted data/$x/utt2spk
-        #utils/utt2spk_to_spk2utt.pl <data/$x/utt2spk > data/$x/spk2utt
-    #done
+    local/prepare_data.py --dir /disk/scratch3/zzhao/data/modified_yesno
+    local/prepare_sam_data.py --dir /disk/scratch3/zzhao/data/modified_yesno
+    local/prepare_sam_noise_data.py --dir /disk/scratch3/zzhao/data/modified_yesno
+    for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
+        sort data/$x/wav.scp > data/$x/wav.scp.sorted
+        sort data/$x/text > data/$x/text.sorted
+        sort data/$x/utt2spk > data/$x/utt2spk.sorted
+        mv data/$x/wav.scp.sorted data/$x/wav.scp
+        mv data/$x/text.sorted data/$x/text
+        mv data/$x/utt2spk.sorted data/$x/utt2spk
+        utils/utt2spk_to_spk2utt.pl <data/$x/utt2spk > data/$x/spk2utt
+    done
     for x in test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise; do
         sort data/$x/wav.scp > data/$x/wav.scp.sorted
         sort data/$x/text > data/$x/text.sorted
