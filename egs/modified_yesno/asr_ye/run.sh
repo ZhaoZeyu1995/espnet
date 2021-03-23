@@ -35,8 +35,8 @@ subtag=""
 set -euo pipefail
 
 fbankdir=fbank
-train_set=train_3gram
-train_dev=dev_3gram
+train_set=train_yyn
+train_dev=dev_yyn
 recog_set="test_yyn test_ynn test_3gram test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise"
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
