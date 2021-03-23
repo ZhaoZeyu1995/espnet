@@ -28,6 +28,7 @@ recog_model=model.loss.best # set a model to be used for decoding: 'model.acc.be
 
 # exp tag
 tag="" # tag for managing experiments.
+subtag=""
 
 . utils/parse_options.sh || exit 1;
 
