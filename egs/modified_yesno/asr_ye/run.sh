@@ -129,6 +129,9 @@ if [ -z ${tag} ]; then
     if ${do_delta}; then
         expname=${expname}_delta
     fi
+    if [ ! -z ${subtag} ]; then
+        expname=${expname}_${subtag}
+    fi
 else
     expname=${train_set}_${backend}_${tag}
 fi
