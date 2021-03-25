@@ -1,9 +1,9 @@
 # network architecture
 # encoder related
-etype: bgrup # encoder architecture type
-elayers: 3
-eunits: 95
-eprojs: 95
+etype: blstmp # encoder architecture type
+elayers: 1
+eunits: 10
+eprojs: 10
 subsample: "1_2_2_1_1" # skip every n frame from input to nth layers
 # decoder related
 dlayers: 1
