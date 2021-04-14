@@ -31,6 +31,9 @@ tag="" # tag for managing experiments.
 subtag=""
 train_set=train_yyn
 train_dev=dev_yyn
+elayers=1
+eunits=20
+eprojs=20
 
 . utils/parse_options.sh || exit 1;
 
@@ -147,6 +150,9 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     ${cuda_cmd} --gpu ${ngpu} ${expdir}/train.log \
         asr_train.py \
         --config ${train_config} \
+        --elayers ${elayers} \
+        --eunits ${eunits} \
+        --eprojs ${eprojs} \
         --ngpu ${ngpu} \
         --backend ${backend} \
         --outdir ${expdir}/results \
