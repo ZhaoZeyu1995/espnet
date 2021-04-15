@@ -10,7 +10,7 @@ for dataset in yyn ynn 3gram; do
             subtag=${elayers}_${eunits}_nosub
             ./run.sh --stage 1 \
                 --train-config ${train_config} \
-                --subtag ${subtag} \ 
+                --subtag ${subtag} \
                 --train-set ${train_set} \
                 --train-dev ${train_dev} \
                 --elayers ${elayers} \
