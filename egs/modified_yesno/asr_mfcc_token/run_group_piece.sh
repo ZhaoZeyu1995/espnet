@@ -2,7 +2,7 @@
 
 train_config=conf/train_nosub.yaml
 
-for dataset in yyn; do
+for dataset in 3gram; do
     train_set=train_${dataset}
     train_dev=dev_${dataset}
     for elayers in 1 2 3; do
