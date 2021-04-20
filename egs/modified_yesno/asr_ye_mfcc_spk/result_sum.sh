@@ -1,6 +1,6 @@
 #!/bin/bash
 
-output_file="asr_ye_mfcc_spk.result"
+output_file="exp/asr_ye_mfcc_spk.result"
 for train_set in train_yyn train_ynn train_3gram; do
     for nlayer in 1 2 3; do
         for eunits in 10 20 30 40 50 60 70 80 90 100 110 120 130; do
