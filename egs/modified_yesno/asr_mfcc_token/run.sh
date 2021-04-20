@@ -29,11 +29,11 @@ recog_model=model.loss.best # set a model to be used for decoding: 'model.acc.be
 # exp tag
 tag="" # tag for managing experiments.
 subtag=""
-train_set=train_yyn
-train_dev=dev_yyn
-elayers=1
-eunits=20
-eprojs=20
+train_set=train_ynn
+train_dev=dev_ynn
+elayers=3
+eunits=30
+eprojs=30
 
 . utils/parse_options.sh || exit 1;
 
@@ -41,6 +41,10 @@ set -euo pipefail
 
 fbankdir=fbank
 mfccdir=mfcc
+
+# bpemode (unigram or bpe)
+nbpe=4
+bpemode=unigram
 
 recog_set="test_yyn test_ynn test_3gram test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise"
 
@@ -108,25 +112,47 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 
 fi
 
-dict=data/lang_1char/${train_set}_units.txt
+dict=data/lang_1char/${train_set}_units_word.txt
+#dict=data/lang_char/${train_set}_${bpemode}${nbpe}_units.txt
+#bpemodel=data/lang_char/${train_set}_${bpemode}${nbpe}
 echo "dictionary: ${dict}"
 if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
     ### Task dependent. You have to check non-linguistic symbols used in the corpus.
     echo "stage 2: Dictionary and Json Data Preparation"
     mkdir -p data/lang_1char/
+    #mkdir -p data/lang_char/
+    #echo "<unk> 1" > ${dict} # <unk> must be 1, 0 will be used for "blank" in CTC
     echo "<unk> 1" > ${dict} # <unk> must be 1, 0 will be used for "blank" in CTC
+    #cut -f 2- -d" " data/${train_set}/text > data/lang_char/input.txt
+    #spm_train --input=data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
+    #spm_encode --model=${bpemodel}.model --output_format=piece < data/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >> ${dict}
+    #wc -l ${dict}
+
     text2token.py -s 1 -n 1 data/${train_set}/text | cut -f 2- -d" " | tr " " "\n" \
     | sort | uniq | grep -v -e '^\s*$' | awk '{print $0 " " NR+1}' >> ${dict}
+    #text2vocabulary.py -s 2 data/${train_set}/text | cut -f 2- -d" " | tr " " "\n" \
+    #| sort | uniq | grep -v -e '^\s*$' | awk '{print $0 " " NR+1}' >> ${dict}
+    #text2vocabulary.py -s 2 data/${train_set}/text >> ${dict}
     wc -l ${dict}
+    #data2json.sh --nj 1 --feat ${feat_sp_dir}/feats.scp --bpecode ${bpemodel}.model \
+        #data/${train_sp} ${dict} > ${feat_sp_dir}/data_${bpemode}${nbpe}.json
+    #data2json.sh --nj 1 --feat ${feat_dt_dir}/feats.scp --bpecode ${bpemodel}.model \
+        #data/${train_dev} ${dict} > ${feat_dt_dir}/data_${bpemode}${nbpe}.json
+
+    #for rtask in ${recog_set}; do
+        #feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}
+        #data2json.sh --nj 1 --feat ${feat_recog_dir}/feats.scp --bpecode ${bpemodel}.model \
+            #data/${rtask} ${dict} > ${feat_recog_dir}/data_${bpemode}${nbpe}.json
+    #done
 
     # make json labels
-    data2json.sh --feat ${feat_tr_dir}/feats.scp \
+    data2json.sh --feat ${feat_tr_dir}/feats.scp\
          data/${train_set} ${dict} > ${feat_tr_dir}/data.json
-    data2json.sh --feat ${feat_dt_dir}/feats.scp \
+    data2json.sh --feat ${feat_dt_dir}/feats.scp\
          data/${train_dev} ${dict} > ${feat_dt_dir}/data.json
     for rtask in ${recog_set}; do
         feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}
-        data2json.sh --feat ${feat_recog_dir}/feats.scp \
+        data2json.sh --feat ${feat_recog_dir}/feats.scp\
             data/${rtask} ${dict} > ${feat_recog_dir}/data.json
     done
 fi
