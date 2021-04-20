@@ -442,7 +442,7 @@ class E2E(ASRInterface, torch.nn.Module):
 
         if prev:
             self.train()
-        return y
+        return y, lpz
 
     def enhance(self, xs):
         """Forward only in the frontend stage.

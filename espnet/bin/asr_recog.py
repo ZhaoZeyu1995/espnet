@@ -360,4 +360,10 @@ def main(args):
 
 
 if __name__ == "__main__":
+    lpzscp = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/lpz.scp'
+    lpztxtscp = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/lpztxt.scp'
+    if os.path.exists(lpzscp):
+        os.remove(lpzscp)
+    if os.path.exists(lpztxtscp):
+        os.remove(lpztxtscp)
     main(sys.argv[1:])

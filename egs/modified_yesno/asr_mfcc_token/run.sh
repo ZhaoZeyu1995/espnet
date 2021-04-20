@@ -29,11 +29,11 @@ recog_model=model.loss.best # set a model to be used for decoding: 'model.acc.be
 # exp tag
 tag="" # tag for managing experiments.
 subtag=""
-train_set=train_ynn
-train_dev=dev_ynn
-elayers=3
-eunits=30
-eprojs=30
+train_set=train_yyn
+train_dev=dev_yyn
+elayers=2
+eunits=50
+eprojs=50
 
 . utils/parse_options.sh || exit 1;
 
@@ -46,7 +46,7 @@ mfccdir=mfcc
 nbpe=4
 bpemode=unigram
 
-recog_set="test_yyn test_ynn test_3gram test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise"
+recog_set="train_yyn train_ynn train_3gram test_yyn test_ynn test_3gram test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise"
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     ### Task dependent. You have to make data the following preparation part by yourself.
