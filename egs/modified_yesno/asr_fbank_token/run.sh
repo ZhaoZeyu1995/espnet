@@ -30,7 +30,7 @@ recog_model=model.loss.best # set a model to be used for decoding: 'model.acc.be
 tag="" # tag for managing experiments.
 subtag=""
 train_set=train_yyn
-train_dev=dev_yyn
+train_dev=test_yyn
 elayers=3
 eunits=80
 eprojs=80
@@ -80,16 +80,16 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     ### But you can utilize Kaldi recipes in most cases
     echo "stage 1: Feature Generation"
      #Feature extraction
-    for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
-        steps/make_fbank_pitch.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_fbank/${x} ${fbankdir}
-        utils/fix_data_dir.sh data/${x}
-        steps/compute_cmvn_stats.sh data/${x} exp/make_fbank/${x} ${fbankdir}
-    done
-    for x in test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise; do
-        steps/make_fbank_pitch.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_fbank/${x} ${fbankdir}
-        utils/fix_data_dir.sh data/${x}
-        steps/compute_cmvn_stats.sh data/${x} exp/make_fbank/${x} ${fbankdir}
-    done
+    #for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
+        #steps/make_fbank_pitch.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_fbank/${x} ${fbankdir}
+        #utils/fix_data_dir.sh data/${x}
+        #steps/compute_cmvn_stats.sh data/${x} exp/make_fbank/${x} ${fbankdir}
+    #done
+    #for x in test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise; do
+        #steps/make_fbank_pitch.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_fbank/${x} ${fbankdir}
+        #utils/fix_data_dir.sh data/${x}
+        #steps/compute_cmvn_stats.sh data/${x} exp/make_fbank/${x} ${fbankdir}
+    #done
 
     # compute global CMVN
     compute-cmvn-stats scp:data/${train_set}/feats.scp data/${train_set}/cmvn.ark

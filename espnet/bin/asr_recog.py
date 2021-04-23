@@ -258,6 +258,11 @@ def get_parser():
         help="Threshold probability for CTC output",
     )
 
+    parser.add_argument("--lpz-output-dir", 
+            type=str, 
+            default="",
+            help="Output directory for lpz data.")
+
     return parser
 
 
@@ -265,6 +270,13 @@ def main(args):
     """Run the main decoding function."""
     parser = get_parser()
     args = parser.parse_args(args)
+    if args.lpz_output_dir != '':
+        lpzscp = os.path.join(args.lpz_output_dir, 'lpz.scp')
+        lpztxtscp =os.path.join(args.lpz_output_dir, 'lpztxt.scp') 
+        lpzdata_path = os.path.join(args.lpz_output_dir, 'data')
+        lpztxtdata_path = os.path.join(args.lpz_output_dir, 'txtdata')
+        os.makedirs(lpzdata_path, exist_ok=True)
+        os.makedirs(lpztxtdata_path, exist_ok=True)
 
     if args.ngpu == 0 and args.dtype == "float16":
         raise ValueError(f"--dtype {args.dtype} does not support the CPU backend.")
@@ -360,10 +372,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    lpzscp = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/lpz.scp'
-    lpztxtscp = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/lpztxt.scp'
-    if os.path.exists(lpzscp):
-        os.remove(lpzscp)
-    if os.path.exists(lpztxtscp):
-        os.remove(lpztxtscp)
     main(sys.argv[1:])

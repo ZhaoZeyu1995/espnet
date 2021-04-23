@@ -1137,16 +1137,17 @@ def recog(args):
                     new_js[name] = add_results_to_json(
                         js[name], nbest_hyp, train_args.char_list
                     )
-                    lpz = lpzs[i]
-                    filepath = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/data/%s.npy' % (name)
-                    txtfilepath = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/txtdata/%s.txt' % (name)
-                    lpzscp = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/lpz.scp'
-                    lpztxtscp = '/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/test/lpztxt.scp'
-                    np.save(filepath, lpz)
-                    np.savetxt(txtfilepath, lpz)
-                    with open(lpzscp, 'a') as f, open(lpztxtscp, 'a') as g:
-                        f.write('%s %s\n' % (name, filepath))
-                        g.write('%s %s\n' % (name, txtfilepath))
+                    if args.lpz_output_dir != '':
+                        lpz = lpzs[i]
+                        filepath = os.path.join(args.lpz_output_dir, 'data', '%s.npy' % (name))
+                        txtfilepath = os.path.join(args.lpz_output_dir, 'txtdata', '%s.npy' % (name))
+                        lpzscp = os.path.join(args.lpz_output_dir, 'lpz.scp')
+                        lpztxtscp = os.path.join(args.lpz_output_dir, 'lpztxt.scp')
+                        np.save(filepath, lpz)
+                        np.savetxt(txtfilepath, lpz)
+                        with open(lpzscp, 'a') as f, open(lpztxtscp, 'a') as g:
+                            f.write('%s %s\n' % (name, filepath))
+                            g.write('%s %s\n' % (name, txtfilepath))
 
     with open(args.result_label, "wb") as f:
         f.write(
