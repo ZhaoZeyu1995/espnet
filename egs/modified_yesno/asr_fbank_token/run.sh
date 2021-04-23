@@ -18,7 +18,7 @@ verbose=1      # verbose option
 resume=        # Resume the training from snapshot
 
 # feature configuration
-do_delta=true
+do_delta=false
 
 train_config=conf/train.yaml
 decode_config=conf/decode.yaml
@@ -41,10 +41,6 @@ set -euo pipefail
 
 fbankdir=fbank
 mfccdir=mfcc
-
-# bpemode (unigram or bpe)
-nbpe=4
-bpemode=unigram
 
 recog_set="train_yyn train_ynn train_3gram test_yyn test_ynn test_3gram test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise"
 
@@ -84,16 +80,16 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     ### But you can utilize Kaldi recipes in most cases
     echo "stage 1: Feature Generation"
      #Feature extraction
-    #for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
-        #steps/make_mfcc.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_mfcc/${x} ${mfccdir}
-        #utils/fix_data_dir.sh data/${x}
-        #steps/compute_cmvn_stats.sh data/${x} exp/make_mfcc/${x} ${mfccdir}
-    #done
-    #for x in test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise; do
-        #steps/make_mfcc.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_mfcc/${x} ${mfccdir}
-        #utils/fix_data_dir.sh data/${x}
-        #steps/compute_cmvn_stats.sh data/${x} exp/make_mfcc/${x} ${mfccdir}
-    #done
+    for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
+        steps/make_fbank_pitch.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_fbank/${x} ${fbankdir}
+        utils/fix_data_dir.sh data/${x}
+        steps/compute_cmvn_stats.sh data/${x} exp/make_fbank/${x} ${fbankdir}
+    done
+    for x in test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise; do
+        steps/make_fbank_pitch.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_fbank/${x} ${fbankdir}
+        utils/fix_data_dir.sh data/${x}
+        steps/compute_cmvn_stats.sh data/${x} exp/make_fbank/${x} ${fbankdir}
+    done
 
     # compute global CMVN
     compute-cmvn-stats scp:data/${train_set}/feats.scp data/${train_set}/cmvn.ark
