@@ -7,7 +7,7 @@ for dataset in yyn ynn 3gram; do
     train_dev=test_${dataset}
     for elayers in 1 2 3; do
         for eunits in 10 20 30 40 50 60 70 80 90 100 110 120 130; do
-            subtag=${elayers}_${eunits}_nosub
+            subtag=${elayers}_${eunits}_nosub_test
             ./run.sh --stage 1 \
                 --train-config ${train_config} \
                 --subtag ${subtag} \
