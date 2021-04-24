@@ -15,7 +15,7 @@ if __name__ == '__main__':
     for subdir in ['yyn', 'ynn', '3gram']:
 
         samples = []
-        with open(os.path.join(dir, 'trans_single_token', subdir + '.txt')) as f:
+        with open(os.path.join(dir, 'trans_char', subdir + '.txt')) as f:
             for line in f:
                 lc = line.strip().split()
                 samples.append([lc[0], ' '.join(lc[1:])])
