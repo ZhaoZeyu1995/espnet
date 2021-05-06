@@ -29,11 +29,11 @@ recog_model=model.loss.best # set a model to be used for decoding: 'model.acc.be
 # exp tag
 tag="" # tag for managing experiments.
 subtag=""
-train_set=train_yyn
-train_dev=dev_yyn
-elayers=3
-eunits=70
-eprojs=70
+train_set=train_ynn
+train_dev=dev_ynn
+elayers=2
+eunits=50
+eprojs=50
 
 . utils/parse_options.sh || exit 1;
 
@@ -192,7 +192,8 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
             --verbose ${verbose} \
             --recog-json ${feat_recog_dir}/split${nj}utt/data.JOB.json \
             --result-label ${expdir}/${decode_dir}/data.JOB.json \
-            --model ${expdir}/results/${recog_model}
+            --model ${expdir}/results/${recog_model} \
+            --lpz-output-dir ~/Documents/asr_mfcc_char_lpz/
 
         score_sclite.sh ${expdir}/${decode_dir} ${dict}
 
