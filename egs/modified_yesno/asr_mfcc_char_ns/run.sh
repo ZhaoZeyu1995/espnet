@@ -43,23 +43,27 @@ set -euo pipefail
 fbankdir=fbank
 mfccdir=mfcc
 
-recog_set="train_yyn train_ynn train_3gram test_yyn test_ynn test_3gram test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise"
-snr_recog_set=""
-for snr in 10 12 14 16 18; do
-    snr_recog_set="${snr_recog_set} test_yyn_SNR${snr} test_ynn_SNR${snr} test_3gram_SNR${snr}"
-done
+recog_set="train_yyn train_ynn test_yyn test_ynn test_sam_yyn test_sam_ynn test_sam_yyn_noise test_sam_ynn_noise"
+snr_recog_set="test_yyn_SNR10 test_ynn_SNR10 test_yyn_SNR12 test_ynn_SNR12 test_yyn_SNR14 test_ynn_SNR14 test_yyn_SNR16 test_ynn_SNR16 test_yyn_SNR18 test_ynn_SNR18"
+#for snr in 10 12 14 16 18; do
+    #snr_recog_set="${snr_recog_set} test_yyn_SNR${snr} test_ynn_SNR${snr} test_3gram_SNR${snr}"
+#done
 recog_set="${recog_set} ${snr_recog_set}"
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     ### Task dependent. You have to make data the following preparation part by yourself.
     ### But you can utilize Kaldi recipes in most cases
     echo "stage 0: Data preparation"
-    data_dir=/disk/scratch3/zzhao/data/modified_yesno
+    data_dir=/disk/scratch4/zzhao/data/modified_yesno
     local/prepare_data.py --dir $data_dir
     local/prepare_sam_data.py --dir $data_dir
     local/prepare_sam_noise_data.py --dir $data_dir
-    local/prepare_noisy_data.py --dir $data_dir
-    for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
+    local/prepare_noisy_data_n.py --dir $data_dir --snr 10
+    local/prepare_noisy_data_n.py --dir $data_dir --snr 12
+    local/prepare_noisy_data_n.py --dir $data_dir --snr 14
+    local/prepare_noisy_data_n.py --dir $data_dir --snr 16
+    local/prepare_noisy_data_n.py --dir $data_dir --snr 18
+    for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn; do
         sort data/$x/wav.scp > data/$x/wav.scp.sorted
         sort data/$x/text > data/$x/text.sorted
         sort data/$x/utt2spk > data/$x/utt2spk.sorted
@@ -68,7 +72,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
         mv data/$x/utt2spk.sorted data/$x/utt2spk
         utils/utt2spk_to_spk2utt.pl <data/$x/utt2spk > data/$x/spk2utt
     done
-    for x in test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise; do
+    for x in test_sam_yyn test_sam_ynn test_sam_yyn_noise test_sam_ynn_noise; do
         sort data/$x/wav.scp > data/$x/wav.scp.sorted
         sort data/$x/text > data/$x/text.sorted
         sort data/$x/utt2spk > data/$x/utt2spk.sorted
@@ -96,12 +100,12 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     ### But you can utilize Kaldi recipes in most cases
     echo "stage 1: Feature Generation"
      #Feature extraction
-    #for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn train_3gram dev_3gram test_3gram; do
+    #for x in train_yyn dev_yyn test_yyn train_ynn dev_ynn test_ynn; do
         #steps/make_mfcc.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_mfcc/${x} ${mfccdir}
         #utils/fix_data_dir.sh data/${x}
         #steps/compute_cmvn_stats.sh data/${x} exp/make_mfcc/${x} ${mfccdir}
     #done
-    #for x in test_sam_yyn test_sam_ynn test_sam_3gram test_sam_yyn_noise test_sam_ynn_noise test_sam_3gram_noise; do
+    #for x in test_sam_yyn test_sam_ynn test_sam_yyn_noise test_sam_ynn_noise; do
         #steps/make_mfcc.sh --nj 1 --write_utt2num_frames true data/${x} exp/make_mfcc/${x} ${mfccdir}
         #utils/fix_data_dir.sh data/${x}
         #steps/compute_cmvn_stats.sh data/${x} exp/make_mfcc/${x} ${mfccdir}
@@ -111,7 +115,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
         #utils/fix_data_dir.sh data/${x}
         #steps/compute_cmvn_stats.sh data/${x} exp/make_mfcc/${x} ${mfccdir}
     #done
-    # compute global CMVN
+    #compute global CMVN
     compute-cmvn-stats scp:data/${train_set}/feats.scp data/${train_set}/cmvn.ark
 
     # dump features
