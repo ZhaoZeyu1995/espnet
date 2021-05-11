@@ -1,15 +1,16 @@
 #!/bin/bash
 
 test_sets=""
-for snr in 10 12 14 16 18; do
-    for subset in test_yyn test_ynn; do
-        test_sets="${subset}_SNR${snr} ${test_sets}"
+
+for subset in test_yyn test_ynn; do
+    for snr in 10 12 14 16 18; do
+        test_sets="${test_sets} ${subset}_SNR${snr}"
     done
 done
-for train_set in train_yyn; do
+for train_set in train_yyn train_ynn; do
     for nlayer in 1 2 3; do
-        for eunits in 50 60 70 80 90 100; do
-            for random_seed in 1 2 3 4 5 6 7 8 9 10; do
+        for eunits in 50 60 70 80 90; do
+            for random_seed in 1 3 5 7 9; do
                 sum_wer=""
                 expdir=exp/${train_set}_pytorch_train_delta_${nlayer}_${eunits}_${random_seed}
                 exp_output_file="${expdir}/result.sum"
