@@ -20,7 +20,6 @@ parser.add_argument('-w', '--word-file',
 args = parser.parse_args()
 
 
-
 def logaddlist(array):
     N = array.shape[0]
     ori = array[0, :]
@@ -28,7 +27,6 @@ def logaddlist(array):
         ori = np.logaddexp(ori, array[i, :])
     ori = np.expand_dims(ori, axis=0)
     return ori - np.log(N)
-
 
 
 def normalise(args):
@@ -175,14 +173,14 @@ def lexicon_fst(args):
         2
         ''' % (i, i, i)
         g = k2.Fsa.from_str(s, acceptor=False)
-        
+
         symbol2fst.append(g)
     fst_vec = k2.create_fsa_vec(symbol2fst[1:])
     fst_union = k2.union(fst_vec)
     lexicon = k2.closure(fst_union)
     lexicon.draw(os.path.join(args.data_directory, 'lexicon.fst.pdf'), title='lexicon')
-    lexicon.symbols = k2.SymbolTable.from_str(symbols_str)
-    lexicon.aux_symbols = k2.SymbolTable.from_str(symbols_str)
+    # lexicon.symbols = k2.SymbolTable.from_str(symbols_str)
+    # lexicon.aux_symbols = k2.SymbolTable.from_str(symbols_str)
     with open(os.path.join(args.data_directory, 'lexicon.fst.txt'), 'w') as f:
         f.write(k2.to_str(lexicon))
 
@@ -205,48 +203,48 @@ def lexicon_fst_whole(args):
     s = ''
     count = 1
     for i in range(1, num_noneps + 1):
-        s += '0 %d %d %d 0.0\n%d %d %d 0 0.0\n%d %d -1 -1 0.0\n' % (
-            i, i, i, i, i, i, i, num_noneps + 1)
-        # s += '''
-        # 0 %d %d 0.0
-        # %d %d %d 0.0
-        # %d %d -1 0.0''' % (i, i, i, i, i, i, num_noneps + 1)
-    s += '%d\n' % (num_noneps + 1)
-    s1 = '''
-    0 1 1 1 0.0
-    0 2 2 2 0.0
-    0 3 3 3 0.0
-    0 4 4 4 0.0
-    0 5 5 5 0.0 
-    1 1 1 0 0.0
-    1 6 -1 -1 0.0
-    1 0 0 0 0.0
-    2 2 2 0 0.0
-    2 6 -1 -1 0.0
-    2 0 0 0 0.0
-    3 3 3 0 0.0
-    3 6 -1 -1 0.0
-    3 0 0 0 0.0
-    4 4 4 0 0.0
-    4 6 -1 -1 0.0
-    4 0 0 0 0.0
-    5 5 5 0 0.0
-    5 6 -1 -1 0.0
-    5 0 0 0 0.0
-    6
-    '''
+        s += '''
+0 %d %d %d 0.0
+%d %d %d 0 0.0
+%d %d -1 -1 0.0
+%d 0 0 0 0.0''' % (
+            i, i, i, i, i, i, i, num_noneps + 1, i)
+    slines = s.strip().split('\n')
+    def extract_first_index(line):
+        line_content = line.strip().split()
+        return int(line_content[0])
+    slines = sorted(slines, key=lambda l: extract_first_index(l))
+    s = '\n'.join(slines)
+
+    s += '\n%d\n' % (num_noneps + 1)
+    # s1 = '''
+    # 0 1 1 1 0.0
+    # 0 2 2 2 0.0
+    # 0 3 3 3 0.0
+    # 0 4 4 4 0.0
+    # 0 5 5 5 0.0
+    # 1 1 1 0 0.0
+    # 1 6 -1 -1 0.0
+    # 1 0 0 0 0.0
+    # 2 2 2 0 0.0
+    # 2 6 -1 -1 0.0
+    # 2 0 0 0 0.0
+    # 3 3 3 0 0.0
+    # 3 6 -1 -1 0.0
+    # 3 0 0 0 0.0
+    # 4 4 4 0 0.0
+    # 4 6 -1 -1 0.0
+    # 4 0 0 0 0.0
+    # 5 5 5 0 0.0
+    # 5 6 -1 -1 0.0
+    # 5 0 0 0 0.0
+    # 6
+    # '''
     with open('lex.txt', 'w') as f:
         f.write(s)
-    # g = k2.Fsa.from_str(open('lex.txt').read(), acceptor=False)
-    g = k2.Fsa.from_str(s1, acceptor=False)
-    # g = k2.Fsa.from_openfst('./lex.fst', acceptor=False)
-
-    # aux_labels = []
-    # for i in range(1, num_noneps + 1):
-    # aux_labels.extend([i, 0, 0])
-    # g.aux_labels = torch.tensor(aux_labels, dtype=torch.int32)
-    g.symbols = k2.SymbolTable.from_str(symbols_str)
-    g.aux_symbols = k2.SymbolTable.from_str(symbols_str)
+    g = k2.Fsa.from_str(s, acceptor=False)
+    # g.symbols = k2.SymbolTable.from_str(symbols_str)
+    # g.aux_symbols = k2.SymbolTable.from_str(symbols_str)
     g.draw(os.path.join(args.data_directory, 'lexicon.newfst.pdf'), title='lexicon')
     with open(os.path.join(args.data_directory, 'lexicon.newfst.txt'), 'w') as f:
         f.write(k2.to_str(g))
@@ -277,23 +275,24 @@ def gfst(args):
     0 6 0 0 0.0
     1 2 4 4 0.0
     1 6 1 0 0.0
-    1 7 -1 -1 0.0
+    1 7 5 5 0.0
     2 3 1 0 0.0
-    2 7 -1 -1 0.0
+    2 7 5 5 0.0
     3 4 4 4 0.0
-    3 7 -1 -1 0.0
+    3 7 5 5 0.0
     4 5 1 0 0.0
     4 1 3 3 0.0
-    4 7 -1 -1 0.0
+    4 7 5 5 0.0
     5 1 3 3 0.0
-    5 7 -1 -1 0.0
+    5 7 5 5 0.0
     6 2 4 4 0.0
-    6 7 -1 -1 0.0
-    7
+    6 7 5 5 0.0
+    7 8 -1 -1 0.0
+    8
     '''
     yyn_fst = k2.Fsa.from_str(yyn, acceptor=False)
-    yyn_fst.symbols = k2.SymbolTable.from_str(symbols)
-    yyn_fst.aux_symbols = k2.SymbolTable.from_str(symbols)
+    # yyn_fst.symbols = k2.SymbolTable.from_str(symbols)
+    # yyn_fst.aux_symbols = k2.SymbolTable.from_str(symbols)
     gfst_dir = os.path.join(args.data_directory, 'G')
     os.makedirs(gfst_dir, exist_ok=True)
     yyn_fst.draw(os.path.join(gfst_dir, 'yyn.pdf'), 'yyn')
@@ -303,10 +302,10 @@ def gfst(args):
 
 if __name__ == '__main__':
     # print(args.normalise)
-    transform(args)
+    # transform(args)
     # lexicon_fst(args)
-    # lexicon_fst_whole(args)
-    # gfst(args)
+    lexicon_fst_whole(args)
+    gfst(args)
     # ar = np.load('/afs/inf.ed.ac.uk/user/s20/s2070789/Documents/asr_mfcc_char_lpz/data/ynn32.npy')
     # b = logaddlist(ar)
     # print(b)
